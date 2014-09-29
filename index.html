@@ -99,12 +99,12 @@ function updateLatLonFields(lat, lon) {
 }
 window.GeoJSON = {
     type: 'Polygon',
-    coordinates: []
+    coordinates: [[]]
 };
 function updateGeoJSON(cord) {
     if (cord) {
         console.log(cord);
-        window.GeoJSON.coordinates.push(
+        window.GeoJSON.coordinates[0].push(
             [cord.lng(), cord.lat()]
         );
     }
