@@ -97,6 +97,21 @@ function updateLatLonFields(lat, lon) {
     document.getElementById("geojson").innerHTML = '{ "type": "Point", "coordinates": [' + [lon, lat] + '] }';
     document.getElementById("wikipedia").innerHTML = '{{Coord|' + lat + '|' + lon + '|display=title}}';
 }
+window.GeoJSON = {
+    type: 'Polygon',
+    coordinates: []
+};
+function updateGeoJSON(cord) {
+    if (cord) {
+        console.log(cord);
+        window.GeoJSON.coordinates.push(
+            [cord.lng(), cord.lat()]
+        );
+    }
+    var text = JSON.stringify(window.GeoJSON, null, true);
+    document.getElementById("geopoly").innerHTML = text;
+}
+
 
 function showMap() {
     window.gmap = new google.maps.Map2(document.getElementById('gmap'));
@@ -105,6 +120,11 @@ function showMap() {
     gmap.enableContinuousZoom();
     gmap.enableScrollWheelZoom();
     var timer = null;
+    google.maps.Event.addListener(gmap, "click", function(e) {
+        var center = gmap.getCenter();
+        console.log('updateing polygon: ', center);
+        updateGeoJSON(center);
+    });
     google.maps.Event.addListener(gmap, "move", function() {
         var center = gmap.getCenter();
         updateLatLonFields(center.lat(), center.lng());
@@ -200,7 +220,7 @@ function showMap() {
     window.geocoder = new google.maps.ClientGeocoder();
 
     // If query string was provided, geocode it
-    var bits = window.location.href.split('?');
+    var bits = window.location.href.split(/(?:\?|&)/);
     if (bits[1]) {
         var location = decodeURI(bits[1]);
         document.getElementById('geocodeInput').value = location;
@@ -275,6 +295,7 @@ google.setOnLoadCallback(showMap);
         <p><strong>Google Maps zoom level:</strong> <span id="zoom"></span></p>
         <p><strong>GeoJSON:</strong> <span id="geojson"></span></p>
         <p><strong>Wikipedia:</strong> <span id="wikipedia"></span></p>
+        <p><strong>GeoPolygon:</strong> <span id="geopoly"></span></p>
         <p id="timezonep" style="display: none"><strong>Timezone:</strong> <span id="timezone"></span></p>
         <p id="datetimep" style="display: none"><strong>Local time:</strong> <span id="datetime"></span></p>
         <p id="builtby">Built by <a href="http://simonwillison.net/2007/Oct/12/latlon/">Simon Willison</a><br>... hacked for haiti by <a href="http://dbsgeo.com">Dane Springmeyer</a></p>
